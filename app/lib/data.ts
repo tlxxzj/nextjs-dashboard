@@ -230,6 +230,24 @@ export async function fetchFilteredCustomers(query: string) {
   }
 }
 
+export async function fetchCustomersPages(query: string) {
+  noStore();
+  try {
+    const count = await sql`SELECT COUNT(*)
+      FROM customers
+      WHERE
+        name ILIKE ${`%${query}%`} OR
+        email ILIKE ${`%${query}%`}
+    `;
+
+    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch total number of customers.');
+  }
+}
+
 export async function getUser(email: string) {
   noStore();
   try {
